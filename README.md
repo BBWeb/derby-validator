@@ -12,9 +12,11 @@ A simple lib to easily add validation to input fields in Derby.
 var Validator = require('derby-validator');
 
 #### Initiate
-Controller.prototype.init = function(model) {
-  this.validator = new Validator(scoped, origin, fields, options);
+```javascript
+Controller.prototype.init = function(model) {  
+  this.validator = new Validator(scoped, origin, fields, options);  
 }
+```
 
 where:
 
@@ -52,5 +54,5 @@ where:
 #### Template
 `<input name="email" value="{{validator.email.value}}" on-keyup="validator.email.validate()"/>  
 {{if validator.email.isInvalid}}  
-  <span>{{validator.email.messages.0}}</span>  
+    <span>{{validator.email.messages.0}}</span>  
 {{/if}}`
