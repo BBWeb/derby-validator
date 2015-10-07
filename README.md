@@ -1,26 +1,29 @@
 # derby-validator
 A simple lib to easily add validation to input fields in Derby.
 
-## Features
+Features
+--------
 - Map model document to local fields to easily reset or commit changes.
 - Add validation rules for fields to pass.
-- Adds variables to check validity and error-messages
+- Add properties to check validity and error-messages
 
-## Usage example
+Usage
+-----
 
-#### Including
+### Including
+```javascript
 var Validator = require('derby-validator');
+```
 
-#### Initiate
+### Initiate
 ```javascript
 Controller.prototype.init = function(model) {  
   this.validator = new Validator(scoped, origin, fields, options);  
 }
 ```
+*where*:  
 
-where:
-
-- **scoped**: Model  
+-  **scoped**: Model  
   A scoped model to the location on where to put the validator's data.
 
 - **[origin]**: Model|string  
@@ -50,9 +53,128 @@ where:
   - **[messages]**: Collection.<string, string>  
     A collection of messages to add to rules of this instance. Each key is the name of the rule. The value is the message to be shown if validation fails.
 
+*example*:  
+```javascript
+Controller.prototype.init = function(model) {  
+  this.validator = new Validator(
+    // Scoped model  
+    model.at('validator'),
+    // Origin model  
+    model.scope('users'),
+    // Fields  
+    {
+      email: {
+        // Default value  
+        'default': "",
+        // Validations  
+        validations: [
+          {
+            // Rule as string, links to options or defaultValidations.js  
+            rule: "required",
+            // Message to show, overwrites options or default message  
+            message: "You need to write an email."
+          },
+          {
+            // Rule as RegEx 
+            rule: /\S+@\S+\.\S+/,
+            message: "Wrong email format."
+          },
+          {
+            // Rule as function, is called with field value as argument and should return true if value passes the rule.  
+            rule: function(value) {
+              return value.length > 5;
+            }
+            message: "Minimum of 5 characters required."
+          }
+        ]
+      },
+      password: {
+        'default': "",
+        validations: [
+          {
+            // If no message is added, the validator will look at options and defaults to find a message, in that order.   
+            rule: "required" 
+          }
+        ]
+      }
+    },
+    // Options  
+    {
+      // Rules that can be used by fields  
+      rules: {
+        // The property name is also the name of the rule, the value can be a function or a RegEx  
+        required: function(value) {
+          return (value !== null && value !== '');
+        }
+      }
+      // Messages to add to rules with the same property name. Used before default message but after field specific messages.  
+      messages: {
+        required: "Required field."
+      }
+    }
+  );
+};
+```  
+
 
 #### Template
-`<input name="email" value="{{validator.email.value}}" on-keyup="validator.email.validate()"/>  
+```
+<input name="email" value="{{validator.email.value}}" on-keyup="validator.email.validate()" />  
 {{if validator.email.isInvalid}}  
-    <span>{{validator.email.messages.0}}</span>  
-{{/if}}`
+  <span>{{validator.email.messages.0}}</span>  
+{{/if}}
+```
+
+Methods
+-------
+##### .resetForm()
+Sets all field values to origin values.
+
+##### .commit()
+Commits values to model. If you use this, make s(ure that any client or serverside validation is run before.
+
+##### .validateField(fieldName)
+Runs through all validations connected to the field (string fieldName) and sets the field to valid/invalid.
+
+validator.validateField('nameInput');  
+on the validator instance is the same thing as calling  
+.validate();  
+on the scoped model field (as used in example template).
+
+##### .validateAll()
+Calls validateField() on all fields.
+
+##### .checkForInvalidFields() 
+Asks if any field is invalid.  
+
+Note: This does not validate any values, it only knows if something failed validation before.
+
+##### .setInvalid(fieldName, message)
+Used to set a field (string fieldName) as invalid manually. Could be used for server-side validation. Message is a string.
+
+
+Properties
+---------
+*Always available even if fields parameter is not passed to the constructor:*
+##### field.value
+Use for `<input value={{field.value}}>`. Is set to origin value on resetForm() or committed to origin on commit().
+
+---
+
+*Only available if fields parameter is passed to the constructor:*
+##### field.isValid
+False if it hasn't been validated. Useful to see if a field passed its validations.
+
+##### field.isInvalid
+False if it hasn't been validated. Useful to show messages or in some other way display that the field is invalid.  
+See example in template.
+
+##### field.messages
+An array of string messages if the field didn't pass validation. Order of messages is in the same order that the rules are run, based on the order the rules are declared in the fields object parameter. In the example template above: field.messages.0 is the first rule that failed validation.
+
+
+TODO
+====
+
+- Add support for asynchronous validations and field is validating state.
+- Add support for validations to be dependant on (only run) if another validation passed.
