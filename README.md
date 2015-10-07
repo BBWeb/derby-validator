@@ -118,7 +118,7 @@ Controller.prototype.init = function(model) {
 
 
 #### Template
-```
+```html
 <input name="email" value="{{validator.email.value}}" on-keyup="validator.email.validate()" />  
 {{if validator.email.isInvalid}}  
   <span>{{validator.email.messages.0}}</span>  
