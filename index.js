@@ -56,14 +56,14 @@ Validator.prototype.getValues = function () {
   return values;
 }
 
-Validator.prototype.validateField = function (fieldname) {
+Validator.prototype.validate = function (fieldname) {
   this._validateField(fieldname);
 };
 
 Validator.prototype.validateAll = function() {
   var self = this;
   _.each(this.model.get(), function (n, key) {
-    self._validateField(key);
+    self._validate(key);
   });
 };
 
@@ -125,12 +125,12 @@ Validator.prototype._addFieldProperties = function (fieldName, field) {
     isValid: false,
     isInvalid: false,
     validate: function () {
-      self._validateField(fieldName);
+      self._validate(fieldName);
     }
   });
 };
 
-Validator.prototype._validateField = function (fieldName) {
+Validator.prototype._validate = function (fieldName) {
   this.model.del(fieldName + '.messages');
 
   var field = this.model.get(fieldName);
