@@ -59,8 +59,8 @@ Controller.prototype.init = function(model) {
   this.validator = new Validator(
     // Scoped model  
     model.at('validator'),
-    // Origin model  
-    model.scope('users'),
+    // Origin model document, may also be a string that is a path to said document.
+    // model.scope('users.' + userId),
     // Fields  
     {
       email: {
@@ -83,7 +83,7 @@ Controller.prototype.init = function(model) {
             // Rule as function, is called with field value as argument and should return true if value passes the rule.  
             rule: function(value) {
               return value.length > 5;
-            }
+            },
             message: "Minimum of 5 characters required."
           }
         ]
@@ -106,7 +106,7 @@ Controller.prototype.init = function(model) {
         required: function(value) {
           return (value !== null && value !== '');
         }
-      }
+      },
       // Messages to add to rules with the same property name. Used before default message but after field specific messages.  
       messages: {
         required: "Required field."
@@ -119,9 +119,9 @@ Controller.prototype.init = function(model) {
 
 #### Template
 ```
-<input name="email" value="{{validator.email.value}}" on-keyup="validator.email.validate()" />  
+<input name="email" value="{{validator.email.value}}" on-keyup="validator.validate('email')" />  
 {{if validator.email.isInvalid}}  
-  <span>{{validator.email.messages.0}}</span>  
+  <span>{{validator.email.messages[0]}}</span>  
 {{/if}}
 ```
 
@@ -133,16 +133,16 @@ Sets all field values to origin values.
 ##### .commit()
 Commits values to model. If you use this, make s(ure that any client or serverside validation is run before.
 
-##### .validateField(fieldName)
+##### .validate(fieldName)
 Runs through all validations connected to the field (string fieldName) and sets the field to valid/invalid.
 
-validator.validateField('nameInput');  
+validator.validate('nameInput');  
 on the validator instance is the same thing as calling  
 .validate();  
-on the scoped model field (as used in example template).
+on the scoped model field.
 
 ##### .validateAll()
-Calls validateField() on all fields.
+Calls validate() on all fields.
 
 ##### .checkForInvalidFields() 
 Asks if any field is invalid.  
