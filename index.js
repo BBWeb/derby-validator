@@ -57,7 +57,7 @@ Validator.prototype.getValues = function () {
 }
 
 Validator.prototype.validate = function (fieldname) {
-  this._validateField(fieldname);
+  this._validate(fieldname);
 };
 
 Validator.prototype.validateAll = function() {
@@ -67,14 +67,8 @@ Validator.prototype.validateAll = function() {
   });
 };
 
-Validator.prototype.checkForInvalidFields = function() {
-  return _.find(this.model.get(), function (field) {
-    if(field.isInvalid) return field;
-  });
-};
-
 Validator.prototype.setInvalid = function (fieldName, message) {
-  this._setInvalid(fieldName);
+  this._setInvalid(fieldName, false);
   this.model.push(fieldName + '.messages', message || defaultValidations['default'].message);
 };
 
@@ -82,7 +76,7 @@ Validator.prototype.setInvalid = function (fieldName, message) {
  * @public
  * Reset values to origin.
  */
-Validator.prototype.resetForm = function () {
+Validator.prototype.reset = function () {
   this._setup();
 };
 
@@ -146,11 +140,7 @@ Validator.prototype._validate = function (fieldName) {
     }
   };
 
-  if (valid) {
-    this._setValid(fieldName);
-  } else {
-    this._setInvalid(fieldName); 
-  }
+  this._setValidity(fieldName, valid);
 };
 
 Validator.prototype._assignValidations = function (validations) {
@@ -185,10 +175,11 @@ Validator.prototype._check = function (field, rule) {
   if(typeof rule === 'function') return rule(field.value);
 };
 
-Validator.prototype._setInvalid = function (fieldName) {
-  this.model.setEach(fieldName, { isValid: false, isInvalid: true });
+Validator.prototype._setValidity = function (fieldName, validity) {
+  this.model.setEach(fieldName, { isValid: validity, isInvalid: !validity });
+  this._setState();
 };
 
-Validator.prototype._setValid = function (fieldName) {
-  this.model.setEach(fieldName, { isValid: true, isInvalid: false });
+Validator.prototype._setState = function() {
+  this.model.set('hasInvalidFields', _.result(_.find(this.model.get(), {'isInvalid': true}), 'isInvalid')); 
 };
