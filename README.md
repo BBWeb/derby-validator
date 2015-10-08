@@ -59,8 +59,8 @@ Controller.prototype.init = function(model) {
   this.validator = new Validator(
     // Scoped model  
     model.at('validator'),
-    // Origin model  
-    model.scope('users'),
+    // Origin model document, may also be a string that is a path to said document.
+    // model.scope('users.' + userId),
     // Fields  
     {
       email: {
@@ -83,7 +83,7 @@ Controller.prototype.init = function(model) {
             // Rule as function, is called with field value as argument and should return true if value passes the rule.  
             rule: function(value) {
               return value.length > 5;
-            }
+            },
             message: "Minimum of 5 characters required."
           }
         ]
@@ -106,7 +106,7 @@ Controller.prototype.init = function(model) {
         required: function(value) {
           return (value !== null && value !== '');
         }
-      }
+      },
       // Messages to add to rules with the same property name. Used before default message but after field specific messages.  
       messages: {
         required: "Required field."
@@ -119,35 +119,36 @@ Controller.prototype.init = function(model) {
 
 #### Template
 ```html
-<input name="email" value="{{validator.email.value}}" on-keyup="validator.email.validate()" />  
+<input value="{{validator.email.value}}" on-keyup="validator.validate('email')" placeholder="email" /><br />  
 {{if validator.email.isInvalid}}  
-  <span>{{validator.email.messages.0}}</span>  
+  <span style="color:red">{{validator.email.messages[0]}}</span><br /> 
+{{/if}}
+<input value="{{validator.password.value}}" on-keyup="validator.validate('password')" placeholder="password" /><br />  
+{{if validator.password.isInvalid}}  
+  <span style="color:red">{{validator.password.messages[0]}}</span><br />  
+{{/if}}
+<button on-click="validator.validateAll()">Validate</button><br />
+{{if validator.hasInvalidFields}}
+  <span style="color:red">One or more fields are invalid.</span>  
 {{/if}}
 ```
 
 Methods
 -------
-##### .resetForm()
+##### .reset()
 Sets all field values to origin values.
 
 ##### .commit()
 Commits values to model. If you use this, make s(ure that any client or serverside validation is run before.
 
-##### .validateField(fieldName)
+##### .validate(fieldName)
 Runs through all validations connected to the field (string fieldName) and sets the field to valid/invalid.
 
-validator.validateField('nameInput');  
-on the validator instance is the same thing as calling  
-.validate();  
-on the scoped model field (as used in example template).
+Is the same thing as calling: 
+validator[fieldName].validate()
 
 ##### .validateAll()
-Calls validateField() on all fields.
-
-##### .checkForInvalidFields() 
-Asks if any field is invalid.  
-
-Note: This does not validate any values, it only knows if something failed validation before.
+Calls validate() on all fields.
 
 ##### .setInvalid(fieldName, message)
 Used to set a field (string fieldName) as invalid manually. Could be used for server-side validation. Message is a string.
@@ -162,12 +163,14 @@ Use for `<input value={{field.value}}>`. Is set to origin value on resetForm() o
 ---
 
 *Only available if fields parameter is passed to the constructor:*
+##### hasInvalidFields
+True if any field has been invalidated. Useful to check before sending form.
+
 ##### field.isValid
 False if it hasn't been validated. Useful to see if a field passed its validations.
 
 ##### field.isInvalid
-False if it hasn't been validated. Useful to show messages or in some other way display that the field is invalid.  
-See example in template.
+False if it hasn't been validated. Useful to show messages or in some other way display that the field is invalid. See example in template.  
 
 ##### field.messages
 An array of string messages if the field didn't pass validation. Order of messages is in the same order that the rules are run, based on the order the rules are declared in the fields object parameter. In the example template above: field.messages.0 is the first rule that failed validation.
@@ -177,4 +180,4 @@ TODO
 ====
 
 - Add support for asynchronous validations and field is validating state.
-- Add support for validations to be dependant on (only run) if another validation passed.
+- Add support for validations to be dependant on if another validation passed.
