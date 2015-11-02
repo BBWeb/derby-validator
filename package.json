@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "lodash": "*",
     "derby": "^0.6.0-alpha31"
   },
   "author": "cjblomqvist <carl@cjblomqvist.com>",
