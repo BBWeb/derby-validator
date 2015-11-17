@@ -7,8 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "lodash": "*",
-    "derby": "^0.6.0-alpha31"
+    "lodash": "*"
+  },
+  "peerDependencies": {
+    "racer": "^0.7.1"
   },
   "author": "cjblomqvist <carl@cjblomqvist.com>",
   "license": "MIT",
