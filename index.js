@@ -136,7 +136,7 @@ Validator.prototype._validate = function (fieldName) {
   this.model.del(fieldName + '.messages');
 
   var field = this.model.get(fieldName);
-  if(!field || !field.hasOwnProperty('validations')) return;
+  if(!field || !field.hasOwnProperty('validations')) return true;
 
   var valid = true;
   for (var i = 0; i < field.validations.length; i++) {
