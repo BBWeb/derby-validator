@@ -93,9 +93,13 @@ Validator.prototype.reset = function () {
 /*
  * @public
  * Commit values to model. Call after client- and serverside validation.
+ *
+ * @param {Boolean} force - Whether to force commit despite validation not passing
  */
-Validator.prototype.commit = function () {
+Validator.prototype.commit = function (force) {
   if(!this.origin) return;
+
+  if(!force && !this.validateAll()) return;
 
   _.each(this.origin.get(), function (n, key) {
     if(key !== 'id' && this.model.get(key)) this.origin.set(key, this.model.get(key + '.value'));
