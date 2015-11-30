@@ -13,5 +13,5 @@ module.exports = {
 };
 
 function required(value) {
-  return (value !== null && value !== '');
+  return (value !== null && value !== '' && typeof value !== 'undefined');
 }
