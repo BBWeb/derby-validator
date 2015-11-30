@@ -48,6 +48,7 @@ function Validator(model, origin, fields, options) {
   this._setup();
 };
 
+// TODO: Add proper docs for external facing methods, such as this one
 Validator.prototype.getValues = function () {
   var values = {};
   _.each(this.model.get(), function (field, fieldName) {
@@ -56,17 +57,26 @@ Validator.prototype.getValues = function () {
   return values;
 }
 
+// TODO: Add proper docs for external facing methods, such as this one
 Validator.prototype.validate = function (fieldname) {
-  this._validate(fieldname);
+  return this._validate(fieldname);
 };
 
+// TODO: Add proper docs for external facing methods, such as this one
 Validator.prototype.validateAll = function() {
   var self = this;
+  var valid = true;
+
   _.each(this.model.get(), function (n, key) {
-    self._validate(key);
-  });
+    var fieldIsValid = this._validate(key);
+
+    if(valid) valid = fieldIsValid;
+  }, this);
+
+  return valid;
 };
 
+// TODO: Add proper docs for external facing methods, such as this one
 Validator.prototype.setInvalid = function (fieldName, message) {
   this._setValidity(fieldName, false);
   this.model.push(fieldName + '.messages', message || defaultValidations['default'].message);
@@ -87,11 +97,9 @@ Validator.prototype.reset = function () {
 Validator.prototype.commit = function () {
   if(!this.origin) return;
 
-  var self = this;
-
   _.each(this.origin.get(), function (n, key) {
-    self.origin.set(key, self.model.get(key + '.value'));
-  });
+    if(key !== 'id' && this.model.get(key)) this.origin.set(key, this.model.get(key + '.value'));
+  }, this);
 };
 
 Validator.prototype._setup = function () {
@@ -142,6 +150,8 @@ Validator.prototype._validate = function (fieldName) {
   };
 
   this._setValidity(fieldName, valid);
+
+  return valid;
 };
 
 Validator.prototype._assignValidations = function (validations) {
