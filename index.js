@@ -97,11 +97,9 @@ Validator.prototype.reset = function () {
 Validator.prototype.commit = function () {
   if(!this.origin) return;
 
-  var self = this;
-
   _.each(this.origin.get(), function (n, key) {
-    self.origin.set(key, self.model.get(key + '.value'));
-  });
+    if(key !== 'id' && this.model.get(key)) this.origin.set(key, this.model.get(key + '.value'));
+  }, this);
 };
 
 Validator.prototype._setup = function () {
