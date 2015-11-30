@@ -1,14 +1,14 @@
 module.exports = {
-  required: {
-    rule: required,
-    message: 'Required field'
+  "default": {
+    message: 'Something is wrong with this field.'
   },
   email: {
     rule: /\S+@\S+\.\S+/,
     message: 'Wrong email format.'
   },
-  "default": {
-    message: 'Something is wrong with this field.'
+  required: {
+    rule: required,
+    message: 'Required field'
   }
 };
 
