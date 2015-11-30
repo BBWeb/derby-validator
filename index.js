@@ -37,7 +37,14 @@ function Validator(model, origin, fields, options) {
     arg = args.shift();
   }
 
-  if(arg) this.fields = arg;
+  if(arg) {
+    if(Array.isArray(arg)) {
+      // Support passing in an array of fields
+      this.fields = _.zipObject(arg, _.fill(Array(arg.length), {}));
+    } else {
+      this.fields = arg;
+    }
+  }
 
   this.options = _.assign({
     rules: {},
@@ -67,8 +74,8 @@ Validator.prototype.validateAll = function() {
   var self = this;
   var valid = true;
 
-  _.each(this.model.get(), function (n, key) {
-    var fieldIsValid = this._validate(key);
+  _.each(this.model.get(), function (field, fieldName) {
+    var fieldIsValid = this._validate(fieldName);
 
     if(valid) valid = fieldIsValid;
   }, this);
@@ -101,8 +108,8 @@ Validator.prototype.commit = function (force) {
 
   if(!force && !this.validateAll()) return;
 
-  _.each(this.origin.get(), function (n, key) {
-    if(key !== 'id' && this.model.get(key)) this.origin.set(key, this.model.get(key + '.value'));
+  _.each(this.model.get(), function (field, fieldName) {
+    if(fieldName !== 'id' && field && field.hasOwnProperty('value')) this.origin.set(fieldName, field.value);
   }, this);
 };
 
@@ -110,30 +117,38 @@ Validator.prototype._setup = function () {
   var self = this;
 
   if (this.fields) {
-    _.each(this.fields, function (n, key) {
-      self._addFieldProperties(key, n);
+    _.each(this.fields, function (field, fieldName) {
+      self._addFieldProperties(fieldName, field);
     });
   };
 
   if(this.origin) {
     _.each(this.origin.get(), function (value, fieldName) {
       self.model.set(fieldName + '.value', value);
-    });
+    }, this);
   };
 };
 
 Validator.prototype._addFieldProperties = function (fieldName, field) {
   var self = this;
+  var data = {value: null};
 
-  this.model.setEach(fieldName, {
-    value: field.default,
-    validations: this._assignValidations(field.validations),
-    isValid: false,
-    isInvalid: false,
-    validate: function () {
-      self._validate(fieldName);
+  if(field) {
+    data = {value: field.default};
+
+    if(field.validations) {
+      _.assign(data, {
+          validations: this._assignValidations(field.validations),
+          isValid: false,
+          isInvalid: false,
+          validate: function () {
+            self._validate(fieldName);
+          }
+        });
     }
-  });
+  }
+
+  this.model.setEach(fieldName, data);
 };
 
 Validator.prototype._validate = function (fieldName) {
