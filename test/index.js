@@ -8,34 +8,100 @@ beforeEach(function setupModel() {
 });
 
 describe('Setup', function () {
-  it('throws on no arguments', function () {
-    expect(function () {
-      var validator = new Validator();
-    }).to.throwError();
-  });
+  describe('arguments', function () {
+    it('throws on no arguments', function () {
+      expect(function () {
+        var validator = new Validator();
+      }).to.throwError();
+    });
 
-  it('throws on one argument', function () {
-    expect(function () {
+    it('throws on one argument', function () {
+      expect(function () {
+        var $validator = this.model.at('validator');
+
+        var validator = new Validator($validator);
+      }.bind(this)).to.throwError();
+    });
+
+    it('passing in origin is treated as origin', function () {
+      var $validator = this.model.at('validator');
+      var $item = this.model.scope('items.1');
+
+      var validator = new Validator($validator, $item);
+
+      expect(validator.fields).to.be(undefined);
+      expect(validator.origin).to.not.be(undefined);
+    });
+
+    it('fields object with path field is not treated as origin', function () {
       var $validator = this.model.at('validator');
 
-      var validator = new Validator($validator);
-    }.bind(this)).to.throwError();
+      var validator = new Validator($validator, {path: {}});
+
+      expect(validator.origin).to.be(undefined);
+      expect(validator.fields).to.not.be(undefined);
+    });
+
+    it('default object (with fields) parameter is not treated as origin', function () {
+      var $validator = this.model.at('validator');
+      var defaultObject = {path: 'default.path'};
+      var fields = {
+          path: {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+
+      var validator = new Validator($validator, defaultObject, fields);
+
+      expect(validator.origin).to.be(undefined);
+      expect(validator.fields).to.not.be(undefined);
+    });
   });
 
-  it('passing in origin is treated as origin', function () {
-    var $validator = this.model.at('validator');
-    var $item = this.model.scope('items.1');
-    var validator = new Validator($validator, $item);
+  describe('default data', function () {
+    it('is automatically set when passed in through fields', function () {
+      var $validator = this.model.at('validator');
+      var fields = {
+          path: {
+            "default": 'abc',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+      var expected = 'abc';
 
-    expect(validator.fields).to.be(undefined);
-    expect(validator.origin).to.not.be(undefined);
-  });
+      var validator = new Validator($validator, fields);
+      var actual = $validator.get('path.value');
 
-  it('fields object with path field is not treated as origin', function () {
-    var $validator = this.model.at('validator');
-    var validator = new Validator($validator, {path: {}});
+      expect(actual).to.eql(expected);
+    });
 
-    expect(validator.origin).to.be(undefined);
-    expect(validator.fields).to.not.be(undefined);
+    it('is automatically set when passed in as defaultObject', function () {
+      var $validator = this.model.at('validator');
+      var defaultObject = {path: 'default.path'};
+      var fields = {
+          path: {
+            "default": 'abc',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+      var expected = 'default.path';
+
+      var validator = new Validator($validator, defaultObject, fields);
+      var actual = $validator.get('path.value');
+
+      expect(actual).to.eql(expected);
+    });
   });
 });
