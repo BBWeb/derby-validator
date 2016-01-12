@@ -1,5 +1,4 @@
 var expect = require('expect.js');
-var _ = require('lodash');
 var Model = require('racer/lib/Model');
 var Validator = require('./../lib');
 
@@ -11,7 +10,7 @@ describe('Setup', function () {
   describe('arguments', function () {
     it('throws on no arguments', function () {
       expect(function () {
-        var validator = new Validator();
+        new Validator();
       }).to.throwError();
     });
 
@@ -19,7 +18,7 @@ describe('Setup', function () {
       expect(function () {
         var $validator = this.model.at('validator');
 
-        var validator = new Validator($validator);
+        new Validator($validator);
       }.bind(this)).to.throwError();
     });
 
@@ -46,14 +45,14 @@ describe('Setup', function () {
       var $validator = this.model.at('validator');
       var defaultObject = {path: 'default.path'};
       var fields = {
-          path: {
-            validations: [
-              {
-                rule: 'required'
-              }
-            ]
-          }
-        };
+        path: {
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
 
       var validator = new Validator($validator, defaultObject, fields);
 
@@ -66,18 +65,18 @@ describe('Setup', function () {
     it('is automatically set when passed in through fields', function () {
       var $validator = this.model.at('validator');
       var fields = {
-          path: {
-            "default": 'abc',
-            validations: [
-              {
-                rule: 'required'
-              }
-            ]
-          }
-        };
+        path: {
+          'default': 'abc',
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
       var expected = 'abc';
 
-      var validator = new Validator($validator, fields);
+      new Validator($validator, fields);
       var actual = $validator.get('path.value');
 
       expect(actual).to.eql(expected);
@@ -87,18 +86,18 @@ describe('Setup', function () {
       var $validator = this.model.at('validator');
       var defaultObject = {path: 'default.path'};
       var fields = {
-          path: {
-            "default": 'abc',
-            validations: [
-              {
-                rule: 'required'
-              }
-            ]
-          }
-        };
+        path: {
+          'default': 'abc',
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
       var expected = 'default.path';
 
-      var validator = new Validator($validator, defaultObject, fields);
+      new Validator($validator, defaultObject, fields);
       var actual = $validator.get('path.value');
 
       expect(actual).to.eql(expected);
