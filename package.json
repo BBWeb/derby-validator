@@ -4,13 +4,18 @@
   "description": "A simple lib to easily add validation to input fields in Derby.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "dependencies": {
     "lodash": "*"
   },
   "peerDependencies": {
-    "racer": "^0.7.0 - 0.8"
+    "racer": ">=0.7.0 <0.9.0"
+  },
+  "devDependencies": {
+    "expect.js": "~0.3.1",
+    "mocha": "~1.17.1",
+    "racer": "^0.8.0"
   },
   "author": "cjblomqvist <carl@cjblomqvist.com>",
   "license": "MIT",
