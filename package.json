@@ -4,7 +4,7 @@
   "description": "A simple lib to easily add validation to input fields in Derby.",
   "main": "lib/index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "eslint lib test && mocha"
   },
   "dependencies": {
     "lodash": "*",
@@ -16,7 +16,8 @@
   "devDependencies": {
     "expect.js": "~0.3.1",
     "mocha": "~1.17.1",
-    "racer": ">=0.7.0 <0.9.0"
+    "racer": ">=0.7.0 <0.9.0",
+    "eslint": "^1.10.3"
   },
   "author": "cjblomqvist <carl@cjblomqvist.com>",
   "license": "MIT",
