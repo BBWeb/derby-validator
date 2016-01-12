@@ -21,4 +21,21 @@ describe('Setup', function () {
       var validator = new Validator($validator);
     }.bind(this)).to.throwError();
   });
+
+  it('passing in origin is treated as origin', function () {
+    var $validator = this.model.at('validator');
+    var $item = this.model.scope('items.1');
+    var validator = new Validator($validator, $item);
+
+    expect(validator.fields).to.be(undefined);
+    expect(validator.origin).to.not.be(undefined);
+  });
+
+  it('fields object with path field is not treated as origin', function () {
+    var $validator = this.model.at('validator');
+    var validator = new Validator($validator, {path: {}});
+
+    expect(validator.origin).to.be(undefined);
+    expect(validator.fields).to.not.be(undefined);
+  });
 });
