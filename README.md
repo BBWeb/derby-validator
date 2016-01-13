@@ -138,8 +138,8 @@ Methods
 ##### .reset()
 Sets all field values to origin values.
 
-##### .commit()
-Commits values to model. If you use this, make s(ure that any client or serverside validation is run before.
+##### .commit(force)
+Validates all (unless force === true) and commits values to model.
 
 ##### .validate(fieldName)
 Runs through all validations connected to the field (string fieldName) and sets the field to valid/invalid.
