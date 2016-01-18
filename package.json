@@ -7,7 +7,7 @@
     "test": "eslint lib test && mocha"
   },
   "dependencies": {
-    "lodash": "*",
+    "lodash": "^3.10.0",
     "racer": ">=0.7.0 <0.9.0"
   },
   "peerDependencies": {
