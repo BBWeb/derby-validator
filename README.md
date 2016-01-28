@@ -80,9 +80,9 @@ Controller.prototype.init = function(model) {
             message: "Wrong email format."
           },
           {
-            // Rule as function, is called with field value as argument and should return true if value passes the rule.  
-            rule: function(value) {
-              return value.length > 5;
+            // Rule as function, is called with field value and callback as arguments and must callback with the validation result.  
+            rule: function(value, cb) {
+              cb(value.length > 5);
             },
             message: "Minimum of 5 characters required."
           }
@@ -103,8 +103,8 @@ Controller.prototype.init = function(model) {
       // Rules that can be used by fields  
       rules: {
         // The property name is also the name of the rule, the value can be a function or a RegEx  
-        required: function(value) {
-          return (value !== null && value !== '');
+        required: function(value, cb) {
+          cb(value !== null && value !== '');
         }
       },
       // Messages to add to rules with the same property name. Used before default message but after field specific messages.  
@@ -141,17 +141,17 @@ Sets all field values to origin values.
 ##### .commit(force)
 Validates all (unless force === true) and commits values to model.
 
-##### .validate(fieldName)
-Runs through all validations connected to the field (string fieldName) and sets the field to valid/invalid.
-
+##### .validate(fieldName, cb)
+Runs through all validations connected to the field (string fieldName) and sets the field to valid/invalid. Calls cb when all validation passed or as soon as a validation fails. Callback passes validation state as a boolean.
+ 
 Is the same thing as calling: 
-validator[fieldName].validate()
+validator[fieldName].validate(cb)
 
-##### .validateAll()
-Calls validate() on all fields.
+##### .validateAll(cb)
+Calls validate() on all fields. Callacks when all fields passed validation or as soon as a field failed. Callback passes validation state as a boolean.
 
 ##### .setInvalid(fieldName, message)
-Used to set a field (string fieldName) as invalid manually. Could be used for server-side validation. Message is a string.
+Used to set a field (string fieldName) as invalid manually.
 
 
 Properties
@@ -179,5 +179,4 @@ An array of string messages if the field didn't pass validation. Order of messag
 TODO
 ====
 
-- Add support for asynchronous validations and field is validating state.
 - Add support for validations to be dependant on if another validation passed.
