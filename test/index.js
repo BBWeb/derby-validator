@@ -308,7 +308,7 @@ describe('Validation', function () {
       var expected = _.defaultsDeep({c: {e: 'abc'}}, $origin.get());
 
       var validator = new Validator($validator, $origin, fields);
-      $validator.set('c.e', 'abc');
+      $validator.set('c.e.value', 'abc');
       var actual = validator.getValues();
 
       expect(actual).to.eql(expected);
@@ -330,7 +330,7 @@ describe('Validation', function () {
       var expected = _.cloneDeep(_.defaultsDeep({c: {e: 'abc'}}, $origin.get()));
 
       var validator = new Validator($validator, $origin, fields);
-      $validator.set('c.e', 'abc');
+      $validator.set('c.e.value', 'abc');
       validator.commit();
       var actual = $origin.get();
 
