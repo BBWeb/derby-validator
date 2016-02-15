@@ -203,5 +203,91 @@ describe('Validation', function () {
 
       expect(actual).to.eql(expected);
     });
+
+    it('Does not validate when required but non-existing', function (done) {
+      var $validator = this.model.at('validator');
+      var $origin = this.model.at('collection.1');
+      var fields = {
+        'c.e': {
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = false;
+
+      var validator = new Validator($validator, $origin, fields);
+      validator.validateAll(function (actual) {
+        expect(actual).to.eql(expected);
+        done();
+      });
+    });
+
+    it('Does validate when required existing', function (done) {
+      var $validator = this.model.at('validator');
+      var $origin = this.model.at('collection.1');
+      var fields = {
+        'c.d': {
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = true;
+
+      var validator = new Validator($validator, $origin, fields);
+      validator.validateAll(function (actual) {
+        expect(actual).to.eql(expected);
+        done();
+      });
+    });
+
+    it('Does not validate when required but set empty', function (done) {
+      var $validator = this.model.at('validator');
+      var $origin = this.model.at('collection.1');
+      var fields = {
+        'c.d': {
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = false;
+
+      var validator = new Validator($validator, $origin, fields);
+      $validator.del('c.d.value');
+      validator.validateAll(function (actual) {
+        expect(actual).to.eql(expected);
+        done();
+      });
+    });
+
+    it('Does validate when required and set', function (done) {
+      var $validator = this.model.at('validator');
+      var $origin = this.model.at('collection.1');
+      var fields = {
+        'c.e': {
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = true;
+
+      var validator = new Validator($validator, $origin, fields);
+      $validator.set('c.e', 'abc');
+      validator.validateAll(function (actual) {
+        expect(actual).to.eql(expected);
+        done();
+      });
+    });
   });
 });
