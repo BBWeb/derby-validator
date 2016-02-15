@@ -8,7 +8,10 @@ beforeEach(function setupModel() {
   this.model.set('collection', {
     '1': {
       'a': 'a',
-      'b': 2
+      'b': 2,
+      'c': {
+        'd': 'd'
+      }
     }
   });
 });
@@ -175,6 +178,28 @@ describe('Validation', function () {
 
       new Validator($validator, $origin, fields);
       var actual = $validator.get('a.value');
+
+      expect(actual).to.eql(expected);
+    });
+  });
+
+  describe('Paths', function () {
+    it('Origin copies it\'s data on setup', function () {
+      var $validator = this.model.at('validator');
+      var $origin = this.model.at('collection.1');
+      var fields = {
+        'c.d': {
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = 'd';
+
+      new Validator($validator, $origin, fields);
+      var actual = $validator.get('c.d.value');
 
       expect(actual).to.eql(expected);
     });
