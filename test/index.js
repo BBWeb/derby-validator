@@ -358,5 +358,29 @@ describe('Validation', function () {
 
       expect(actual).to.eql(expected);
     });
+
+    it('Does not commit id', function () {
+      var $validator = this.model.at('validator');
+      var $origin = this.model.at('collection.1');
+      var fields = {
+        'c.d': {},
+        'c.e': {
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = _.cloneDeep(_.defaultsDeep({c: {e: 'abc'}}, $origin.get()));
+
+      var validator = new Validator($validator, $origin, fields);
+      $validator.set('c.e.value', 'abc');
+      $validator.set('id.value', '2');
+      validator.commit();
+      var actual = $origin.get();
+
+      expect(actual).to.eql(expected);
+    });
   });
 });
