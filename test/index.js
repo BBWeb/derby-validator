@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var expect = require('expect.js');
 var Model = require('racer/lib/Model');
 var Validator = require('./../lib');
@@ -288,6 +289,28 @@ describe('Validation', function () {
         expect(actual).to.eql(expected);
         done();
       });
+    });
+
+    it('Does get all values', function () {
+      var $validator = this.model.at('validator');
+      var $origin = this.model.at('collection.1');
+      var fields = {
+        'c.d': {},
+        'c.e': {
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = _.defaultsDeep({c: {e: 'abc'}}, $origin.get());
+
+      var validator = new Validator($validator, $origin, fields);
+      $validator.set('c.e', 'abc');
+      var actual = validator.getValues();
+
+      expect(actual).to.eql(expected);
     });
   });
 });
