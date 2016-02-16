@@ -296,7 +296,7 @@ describe('Validation', function () {
         var expected = true;
 
         var validator = new Validator($validator, $origin, fields);
-        $validator.set('c.e', 'abc');
+        $validator.set('c.e.value', 'abc');
         validator.validateAll(function (actual) {
           expect(actual).to.eql(expected);
           done();
@@ -412,6 +412,183 @@ describe('Validation', function () {
 
         new Validator($validator, $origin, fields);
         var actual = $validator.get('c.d.f.value');
+
+        expect(actual).to.eql(expected);
+      });
+
+      it('Does not validate when required but non-existing', function (done) {
+        var $validator = this.model.at('validator');
+        var $origin = this.model.at('collection.2');
+        var fields = {
+          'c.e.f': {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expected = false;
+
+        var validator = new Validator($validator, $origin, fields);
+        validator.validateAll(function (actual) {
+          expect(actual).to.eql(expected);
+          done();
+        });
+      });
+
+      it('Does validate when required existing', function (done) {
+        var $validator = this.model.at('validator');
+        var $origin = this.model.at('collection.2');
+        var fields = {
+          'c.d.f': {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expected = true;
+
+        var validator = new Validator($validator, $origin, fields);
+        validator.validateAll(function (actual) {
+          expect(actual).to.eql(expected);
+          done();
+        });
+      });
+
+      it('Does not validate when required but set empty', function (done) {
+        var $validator = this.model.at('validator');
+        var $origin = this.model.at('collection.2');
+        var fields = {
+          'c.d.f': {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expected = false;
+
+        var validator = new Validator($validator, $origin, fields);
+        $validator.del('c.d.f.value');
+        validator.validateAll(function (actual) {
+          expect(actual).to.eql(expected);
+          done();
+        });
+      });
+
+      it('Does validate when required and set', function (done) {
+        var $validator = this.model.at('validator');
+        var $origin = this.model.at('collection.2');
+        var fields = {
+          'c.e.f': {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expected = true;
+
+        var validator = new Validator($validator, $origin, fields);
+        $validator.set('c.e.f.value', 'abc');
+        validator.validateAll(function (actual) {
+          expect(actual).to.eql(expected);
+          done();
+        });
+      });
+
+      it('Does get all values', function () {
+        var $validator = this.model.at('validator');
+        var $origin = this.model.at('collection.2');
+        var fields = {
+          'c.d.f': {},
+          'c.e.f': {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expected = _.defaultsDeep({c: {e: {f: 'abc'}}}, $origin.get());
+
+        var validator = new Validator($validator, $origin, fields);
+        $validator.set('c.e.f.value', 'abc');
+        var actual = validator.getValues();
+
+        expect(actual).to.eql(expected);
+      });
+
+      it('Does commit values when valid', function () {
+        var $validator = this.model.at('validator');
+        var $origin = this.model.at('collection.2');
+        var fields = {
+          'c.d.f': {},
+          'c.e.f': {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expected = _.cloneDeep(_.defaultsDeep({c: {e: {f: 'abc'}}}, $origin.get()));
+
+        var validator = new Validator($validator, $origin, fields);
+        $validator.set('c.e.f.value', 'abc');
+        validator.commit();
+        var actual = $origin.get();
+
+        expect(actual).to.eql(expected);
+      });
+
+      it('Does not commit values when not valid', function () {
+        var $validator = this.model.at('validator');
+        var $origin = this.model.at('collection.2');
+        var fields = {
+          'c.d.f': {},
+          'c.e.f': {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expected = _.cloneDeep($origin.get());
+
+        var validator = new Validator($validator, $origin, fields);
+        validator.commit();
+        var actual = $origin.get();
+
+        expect(actual).to.eql(expected);
+      });
+
+      it('Does not commit id', function () {
+        var $validator = this.model.at('validator');
+        var $origin = this.model.at('collection.2');
+        var fields = {
+          'c.d.f': {},
+          'c.e.f': {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expected = _.cloneDeep(_.defaultsDeep({c: {e: {f: 'abc'}}}, $origin.get()));
+
+        var validator = new Validator($validator, $origin, fields);
+        $validator.set('c.e.f.value', 'abc');
+        $validator.set('id.value', '3');
+        validator.commit();
+        var actual = $origin.get();
 
         expect(actual).to.eql(expected);
       });
