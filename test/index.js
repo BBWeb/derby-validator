@@ -592,6 +592,28 @@ describe('Validation', function () {
 
         expect(actual).to.eql(expected);
       });
-    });
+
+      it('Does set changed property on subpath value changes', function () {
+        var $validator = this.model.at('validator');
+        var $origin = this.model.at('collection.2');
+        var fields = {
+          'c.d.f': {},
+          'c.e.f': {
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expected = true;
+
+        new Validator($validator, $origin, fields);
+        $validator.set('c.e.f.value', 'abc');
+        var actual = $validator.get('hasChangedFields');
+
+        expect(actual).to.eql(expected);
+      });
+    });      
   });
 });
