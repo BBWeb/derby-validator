@@ -35,6 +35,9 @@ Controller.prototype.init = function(model) {
   - **[default]**: *  
     A default value for this specific field.
 
+  - **[group]**: *  
+    A group the field belongs to. Useful for looking up validity of multiple fields simultaneously.
+
   - **[validations]**: Object[]  
     A list of validations to apply.
 
@@ -66,6 +69,7 @@ Controller.prototype.init = function(model) {
       email: {
         // Default value  
         'default': "",
+        group: 'A',
         // Validations  
         validations: [
           {
@@ -90,10 +94,19 @@ Controller.prototype.init = function(model) {
       },
       password: {
         'default': "",
+        group: 'B',
         validations: [
           {
             // If no message is added, the validator will look at options and defaults to find a message, in that order.   
             rule: "required" 
+          }
+        ]
+      },
+      name: {
+        group: 'A',
+        validations: [
+          {
+            rule: "required"
           }
         ]
       }
@@ -175,6 +188,10 @@ False if it hasn't been validated. Useful to show messages or in some other way 
 ##### field.messages
 An array of string messages if the field didn't pass validation. Order of messages is in the same order that the rules are run, based on the order the rules are declared in the fields object parameter. In the example template above: field.messages.0 is the first rule that failed validation.
 
+---
+
+##### groups.<group name>.isValid
+Represents the complete validity of a whole group.
 
 TODO
 ====
