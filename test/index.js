@@ -616,4 +616,262 @@ describe('Validation', function () {
       });
     });      
   });
+
+  describe('Has validated', function () {
+    it('Show correct isValid status from scratch', function () {
+      var $validator = this.model.at('validator');
+      var fields = {
+        'a': {
+          group: 'A',
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = false;
+
+      new Validator($validator, fields);
+      var actual = $validator.get('a.isValid');
+
+      expect(actual).to.eql(expected);
+    });
+
+    it('Show correct isValid status from scratch with default', function () {
+      var $validator = this.model.at('validator');
+      var fields = {
+        'a': {
+          group: 'A',
+          default: 'abc',
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = false;
+
+      new Validator($validator, fields);
+      var actual = $validator.get('a.isValid');
+
+      expect(actual).to.eql(expected);
+    });
+
+    it('Show correct isValid status from scratch with origin', function () {
+      var $validator = this.model.at('validator');
+      var $origin = this.model.at('collection.1');
+      var fields = {
+        'a': {
+          group: 'A',
+          default: 'abc',
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = false;
+
+      new Validator($validator, $origin, fields);
+      var actual = $validator.get('a.isValid');
+
+      expect(actual).to.eql(expected);
+    });
+
+    it('Show correct isValid status when checked', function () {
+      var $validator = this.model.at('validator');
+      var fields = {
+        'a': {
+          group: 'A',
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = false;
+
+      var validator = new Validator($validator, fields);
+      validator.validateAll();
+
+      var actual = $validator.get('a.isValid');
+
+      expect(actual).to.eql(expected);
+    });
+
+    it('Show correct isValid status when checked with default', function () {
+      var $validator = this.model.at('validator');
+      var fields = {
+        'a': {
+          group: 'A',
+          default: 'abc',
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = true;
+
+      var validator = new Validator($validator, fields);
+      validator.validateAll();
+
+      var actual = $validator.get('a.isValid');
+
+      expect(actual).to.eql(expected);
+    });
+
+    it('Show correct isValid status when checked with origin', function () {
+      var $validator = this.model.at('validator');
+      var $origin = this.model.at('collection.1');
+      var fields = {
+        'a': {
+          group: 'A',
+          default: 'abc',
+          validations: [
+            {
+              rule: 'required'
+            }
+          ]
+        }
+      };
+      var expected = true;
+
+      var validator = new Validator($validator, $origin, fields);
+      validator.validateAll();
+
+      var actual = $validator.get('a.isValid');
+
+      expect(actual).to.eql(expected);
+    });
+
+    describe.only('Groups', function () {
+      it('Show correct isValid status from scratch', function () {
+        var $validator = this.model.at('validator');
+        var fields = {
+          'a': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'b': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'c': {
+            group: 'B',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expectedA = false;
+        var expectedB = false;
+
+        new Validator($validator, fields);
+        var actualA = $validator.get('groups.A.isValid');
+        var actualB = $validator.get('groups.B.isValid');
+
+        expect(actualA).to.eql(expectedA);
+        expect(actualB).to.eql(expectedB);
+      });
+
+      it('Show correct isValid status when checked', function () {
+        var $validator = this.model.at('validator');
+        var fields = {
+          'a': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'b': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'c': {
+            group: 'B',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expectedA = false;
+        var expectedB = false;
+
+        var validator = new Validator($validator, fields);
+        validator.validateAll();
+
+        var actualA = $validator.get('groups.A.isValid');
+        var actualB = $validator.get('groups.B.isValid');
+
+        expect(actualA).to.eql(expectedA);
+        expect(actualB).to.eql(expectedB);
+      });
+
+      it('Show correct isValid status when checked and data has been set on one of two groups', function () {
+        var $validator = this.model.at('validator');
+        var fields = {
+          'a': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'b': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'c': {
+            group: 'B',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expectedA = true;
+        var expectedB = false;
+
+        var validator = new Validator($validator, fields);
+        $validator.set('a.value', 'abc');
+        validator.validateAll();
+
+        var actualA = $validator.get('groups.A.isValid');
+        var actualB = $validator.get('groups.B.isValid');
+
+        expect(actualA).to.eql(expectedA);
+        expect(actualB).to.eql(expectedB);
+      });
+    });
+  });
 });
