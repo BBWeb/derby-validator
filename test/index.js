@@ -750,7 +750,7 @@ describe('Validation', function () {
       expect(actual).to.eql(expected);
     });
 
-    describe.only('Groups', function () {
+    describe('Groups', function () {
       it('Show correct isValid status from scratch', function () {
         var $validator = this.model.at('validator');
         var fields = {
@@ -779,15 +779,13 @@ describe('Validation', function () {
             ]
           }
         };
-        var expectedA = false;
-        var expectedB = false;
 
         new Validator($validator, fields);
         var actualA = $validator.get('groups.A.isValid');
         var actualB = $validator.get('groups.B.isValid');
 
-        expect(actualA).to.eql(expectedA);
-        expect(actualB).to.eql(expectedB);
+        expect(actualA).to.not.be.ok();
+        expect(actualB).to.not.be.ok();
       });
 
       it('Show correct isValid status when checked', function () {
@@ -831,7 +829,49 @@ describe('Validation', function () {
         expect(actualB).to.eql(expectedB);
       });
 
-      it('Show correct isValid status when checked and data has been set on one of two groups', function () {
+      it('Show correct isValid status when checked and data has been set on one field of many in one group', function () {
+        var $validator = this.model.at('validator');
+        var fields = {
+          'a': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'b': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'c': {
+            group: 'B',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expectedA = false;
+        var expectedB = false;
+
+        var validator = new Validator($validator, fields);
+        $validator.set('a.value', 'abc');
+        validator.validateAll();
+
+        var actualA = $validator.get('groups.A.isValid');
+        var actualB = $validator.get('groups.B.isValid');
+
+        expect(actualA).to.eql(expectedA);
+        expect(actualB).to.eql(expectedB);
+      });
+
+      it('Show correct isValid status when checked and data has been set on all fields of many in one group', function () {
         var $validator = this.model.at('validator');
         var fields = {
           'a': {
@@ -864,6 +904,49 @@ describe('Validation', function () {
 
         var validator = new Validator($validator, fields);
         $validator.set('a.value', 'abc');
+        $validator.set('b.value', 'abc');
+        validator.validateAll();
+
+        var actualA = $validator.get('groups.A.isValid');
+        var actualB = $validator.get('groups.B.isValid');
+
+        expect(actualA).to.eql(expectedA);
+        expect(actualB).to.eql(expectedB);
+      });
+
+      it('Show correct isValid status when checked and data has been set on one of one field in one group', function () {
+        var $validator = this.model.at('validator');
+        var fields = {
+          'a': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'b': {
+            group: 'A',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          },
+          'c': {
+            group: 'B',
+            validations: [
+              {
+                rule: 'required'
+              }
+            ]
+          }
+        };
+        var expectedA = false;
+        var expectedB = true;
+
+        var validator = new Validator($validator, fields);
+        $validator.set('c.value', 'abc');
         validator.validateAll();
 
         var actualA = $validator.get('groups.A.isValid');
